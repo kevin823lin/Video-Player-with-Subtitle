@@ -1,0 +1,73 @@
+<title>VIDEO</title>
+<script type="text/javascript">
+	const max = 12;
+	if (window.location.pathname == '/index.html') {
+		window.location.pathname == '/';
+	}
+	window.addEventListener('load', function () {
+		let v = new URL(window.location.href).searchParams.get("v");
+		if (v) {
+			let home = `<a href='/'>home</a>`;
+			let next = `<a href='/?v=${parseInt(v)+1}'> next</a>`;
+			let video = `
+					<video width="960" height="540" autoplay="true" controls>
+						<source src="./video/${v}.mp4" type="video/mp4">
+						<track src="./sub/${v}.vtt" default>
+					</video>`;
+			document.body.insertAdjacentHTML('beforeend', home + (v == max ? '' : next) + '<br>' + video);
+			let videoEle = document.querySelector("video");
+			if (videoEle) {
+				videoEle.addEventListener('ended', (event) => {
+					let a = document.querySelectorAll("a");
+					if (a.length) {
+						a[a.length - 1].click();
+					}
+				});
+			}
+		} else {
+			for (let i = 1; i <= max; i++) {
+				document.body.insertAdjacentHTML('beforeend', `
+						<a href='/?v=${i}'>${i}.mp4</a><br>`);
+			}
+		}
+	});
+	document.addEventListener('keydown', (e) => {
+		if (!e.repeat) {
+			if (e.key == 'f' || e.key == 'F') {
+				toggleFullScreen(document.querySelector("video"));
+			}
+			else if (e.key == ' ' && document.querySelector("video") && !(document.activeElement && document.activeElement.matches('video'))) {
+				if (document.querySelector("video").paused) {
+					document.querySelector("video").play();
+				}
+				else {
+					document.querySelector("video").pause();
+				}
+			}
+		}
+	});
+	function toggleFullScreen(player) {
+		if (!document.fullscreenElement && // alternative standard method
+			!document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement && player) { // current working methods
+			if (player.requestFullscreen) {
+				player.requestFullscreen();
+			} else if (player.msRequestFullscreen) {
+				player.msRequestFullscreen();
+			} else if (player.mozRequestFullScreen) {
+				player.mozRequestFullScreen();
+			} else if (player.webkitRequestFullscreen) {
+				player.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+			}
+		} else {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.msExitFullscreen) {
+				document.msExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				player.mozCancelFullScreen();
+			} else if (document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			}
+		}
+	}
+</script>
